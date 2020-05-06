@@ -3,7 +3,7 @@ import dash_html_components as html
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 
-from app import app
+from app import app, server
 from apps import index, app1, app2
 
 app.layout = html.Div([
