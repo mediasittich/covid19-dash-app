@@ -4,17 +4,18 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 
 from app import app, server
-from apps import index, app1, app2
+from apps import index, app1, app2, data
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     dbc.NavbarSimple(
         children=[
-            dbc.NavLink('Home', href='/'),
-            dbc.NavLink('Map', href='/app1'),
-            dbc.NavLink('App 2', href='/app2'),
+            dbc.NavLink('About', href='/'),
+            dbc.NavLink('World-wide', href='/app1'),
+            dbc.NavLink('Countries', href='/app2'),
+            dbc.NavLink('Data', href='/data'),
         ],
-        brand='Projekt',
+        brand='COVID-19 Project',
         brand_href='/',
         color='light',
         dark=False
@@ -32,6 +33,8 @@ def render_page_content(pathname):
         return app1.layout
     elif pathname == '/app2':
         return app2.layout
+    elif pathname == '/data':
+        return data.layout
     else:
         return dbc.Jumbotron([
             html.H1('404: Not found', className='text-danger')

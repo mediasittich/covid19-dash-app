@@ -1,50 +1,46 @@
 import os
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
-from scipy.stats.mstats import gmean
 
 # ========================================
 #              LOAD DATA
 # ========================================
-PROJECT_PATH = ''
-project_path = Path(__file__).parent.parent.absolute()
-DATA_PATH = ''
-data_path = os.path.join(project_path, 'data')
-external_data_path = os.path.join(data_path, 'external', '')
-processed_data_path = os.path.join(data_path, 'processed', '')
+PROJECT_PATH = Path(__file__).parent.parent.absolute()
+DATA_PATH = os.path.join(PROJECT_PATH, 'data')
+EXTERNAL_DATA_PATH = os.path.join(DATA_PATH, 'external', '')
+PROCESSED_DATA_PATH = os.path.join(DATA_PATH, 'processed', '')
 
+# ============= COVID-19 Data =============
 # COVID-19 Dataset (Source: RamiKrispin GitHub)
-corona_data_url = 'https://raw.githubusercontent.com/RamiKrispin/coronavirus-csv/master/coronavirus_dataset.csv'
+CORONA_DATA_URL = 'https://raw.githubusercontent.com/RamiKrispin/coronavirus-csv/master/coronavirus_dataset.csv'
+CORONA_DATA = pd.read_csv(CORONA_DATA_URL)
+
+# ============= Continents Data =============
 # Population Data
-population_data_filename = ''
+# Source: UN 2019 Revision of World Population Prospects
+# (https://population.un.org/wpp/Download/Standard/CSV/)
+# https://population.un.org/wpp/DefinitionOfProjectionVariants/
+POPULATION_DATA_FILENAME = os.path.join(
+    EXTERNAL_DATA_PATH, 'WPP2019_TotalPopulationBySex.csv')
+POPULATION_DATA = pd.read_csv(POPULATION_DATA_FILENAME)
+
+# ============= Continents Data =============
+# Load dataset with countries and continents
+# Source: https://datahub.io/JohnSnowLabs/country-and-continent-codes-list#python
+# Assign filename
+CONTINENTS_URL = os.path.join(
+    EXTERNAL_DATA_PATH, 'country-and-continent-codes-list-csv_csv.csv')
+
+# Load dataset to dataframe
+CONTINENTS_DATA = pd.read_csv(CONTINENTS_URL)
+
+# ============= Continents Data =============
 # Government Response Data
-government_response_data_url = ''
+GOVERNMENT_RESPONSE_DATA_BASEURL = 'https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/'
+GOVERNMENT_RESPONSE_TIMESERIES_BASEURL = GOVERNMENT_RESPONSE_DATA_BASEURL + 'timeseries/'
 
-df = pd.read_csv(corona_data_url)
+GOVERNMENT_RESPONSE_LATEST = ''  # Contains Stringency Index
 
-df = df[(df['Country.Region'] == 'Germany') & (
-    df['type'] == 'confirmed')]  # [['Country.Region', 'date', 'cases']]
-
-
-# ========================================
-#              PRE-PROCESSING
-# ========================================
-
-# ------------ Remove Cruise ships from Dataset ------------
-
-
-# ------------ Clean up Province.State ------------
-
-
-#  ------------ Update Country Names to Official Names ------------
-
-
-#  ------------ Add Column 'DisplayName' for Shorter Names in Figures ------------
-
-
-#  ------------ Add ISO Codes to Countries ------------
-
-
-#  ------------ Update Country Names to Official Names ------------
+# Time Series Data
+# Add scraping here

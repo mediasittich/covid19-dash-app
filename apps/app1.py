@@ -1,15 +1,31 @@
+
 import dash_core_components as dcc
 import dash_html_components as html
+import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import dash_table
 
 from app import app
-from src.get_data import df
+from src.features import covid_data
 
-# print(get_data.df.head())
+print(covid_data.head())
+
+map_description = '''
+Some useful info
+'''
 
 layout = html.Div([
-    html.H3('Map'),
+    # Page Header
+    dbc.Row([
+        dbc.Col([
+            html.H3('Map'),
+            html.P(map_description),
+        ]),
+    ]),
+    # World-wide Map and Data
+
+
+
     dcc.Dropdown(
         id='app-1-dropdown',
         options=[
@@ -19,17 +35,7 @@ layout = html.Div([
         ]
     ),
     html.Div(id='app-1-display-value'),
-    html.Div([
-        dash_table.DataTable(
-            id='covid-cases-table',
-            columns=[{'name': i, 'id': i} for i in df.columns],
-            data=df.to_dict('records'),
-            page_size=10,  # for pagination with 10 rows per page
-            style_cell={'textAlign': 'left'},
-            #fixed_rows={'headers': True},
-            #style_table={'height': 400},
-        )
-    ])
+    html.Br(),
 
 ])
 
