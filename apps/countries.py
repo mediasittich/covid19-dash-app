@@ -3,6 +3,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 
 from app import app
+from src.features import covid_data
 
 layout = html.Div([
     html.H3('App 2'),

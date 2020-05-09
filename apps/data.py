@@ -6,9 +6,9 @@ from dash.dependencies import Input, Output
 import dash_table
 
 from app import app
-from src.features import covid_data
+from src.features import covid_data, covid_data_world, case_types
 
-print(covid_data.head())
+print(case_types)
 
 data_description = '''
 Some useful info
@@ -39,10 +39,10 @@ layout = html.Div([
     dbc.Row(dbc.Col([
         dash_table.DataTable(
             id='covid-cases-table',
-            columns=[{'name': i, 'id': i} for i in covid_data.columns],
-            data=covid_data.to_dict('records'),
+            columns=[{'name': i, 'id': i} for i in covid_data_world.columns],
+            data=covid_data_world.to_dict('records'),
             page_size=10,  # for pagination with 10 rows per page
-            style_table={'overflowX': 'auto'},
+            #style_table={'overflowX': 'auto'},
             style_cell={'textAlign': 'left'},
             # fixed_rows={'headers': True},
             # style_table={'height': 400},

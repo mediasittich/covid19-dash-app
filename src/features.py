@@ -281,13 +281,65 @@ def add_population_size(df):
 
 covid_data_pop_size = add_population_size(covid_data_w_continents)
 
+#  ------------ Rename Columns ------------
+# Rename Columns
 
-#  ============ STATISTICS ============
+
+def rename_columns(df):
+    df.rename(columns={'Country.Region': 'Country', 'Lat': 'Latitude', 'Long': 'Longitude', 'cases': 'DailyReportedCases', 'date': 'Date', 'type': 'CaseType',
+                       'iso2Code': 'ISO2Code', 'iso3Code': 'ISO3Code', 'isoNumCode': 'ISONumCode'}, inplace=True)
+    return df
+
+
+covid_data_renamed = rename_columns(covid_data_pop_size)
+
+# ========================================
+#    DATA FRAMES FOR COUNTRIES & WORLD
+# ========================================
+
+#  ============ ALL COUNTRIES ============
+covid_data_countries = covid_data_renamed
+
+
+#  ============ WORLD ============
+# Create World Data Frame
+covid_data_world = covid_data_renamed[['Country', 'TotalPopulation', 'Date', 'CaseType',
+                                       'DailyReportedCases']]
+
+# Create data frame for world-wide case numbers
+covid_data_world = covid_data_world.groupby(
+    ['CaseType', 'Date']).sum().reset_index()
+
+# Add Country Column for Plots
+covid_data_world['Country'] = 'World'
+
+
+# ========================================
+#              STATISTICS
+# ========================================
 
 #  ------------ Calculate Cumulative Sums ------------
-# Function to calculate cases per 100K
+
+
+def calculate_cumsum(df):
+    # Create list with grouping variables for cumsum
+    group_vars = ['Country', 'TotalPopulation']
+
+    df['CumulativeReportedCases'] = df.groupby(
+        group_vars)['DailyReportedCases'].apply(lambda x: x.cumsum())
+    return df
+
+#  ------------ Calculate per 100K ------------
+
+
 def calculate_per_100K(n, popTotal):
     return (n / popTotal) * 100000
+
+#  ------------ Calculate Growth Factors ------------
+
+
+def calculate_growth_factors(df):
+    pass
 
 #  ------------ Calculate Doubling Time ------------
 
@@ -297,86 +349,44 @@ def calculate_doubling_time(geom_mean):
 
 #  ------------ Add Stats ------------
 
+# Apply Statistics Functions to Data Frames
 
-def add_stats(df):
-    # Create list of unique type values
-    types = list(df['type'].unique())
 
-    # Create empty dictionary for dataframes
-    d = {}
-
-    # Create list with grouping variables for cumsum
-    group_vars = ['Country.Region', 'Lat', 'Long', 'iso2Code',
-                  'iso3Code', 'isoNumCode', 'TotalPopulation']
-
-    # Loop through types
-    for case_type in types:
-        # Select rows where 'type' == case_type
-        df_new = df[df['type'] == case_type]
-        # Rename column 'cases' to 'daily_reported_cases'
-        df_new = df_new.rename(columns={'cases': 'daily_reported_cases'})
-        # Reset index (drop current index)
-        df_new = df_new.reset_index(drop=True)
-        # Add column & apply function to calculate cumsum
-        df_new['cumulative_cases'] = df_new.groupby(
-            group_vars)['daily_reported_cases'].apply(lambda x: x.cumsum())
-        # Add df to dict
-        d['df_{}'.format(case_type)] = df_new
-
-    # Calculate Cumulative Cases per 100K
-    # Iterate over all data frames in dictionary
-    for df in d.values():
-        # Calculate daily reported cases per 100K
-        df['daily_per_100K'] = df.apply(lambda x: calculate_per_100K(
-            x['daily_reported_cases'], x['TotalPopulation']), axis=1)
-        # Calculate cumulative  cases per 100K
-        df['cumulative_per_100K'] = df.apply(lambda x: calculate_per_100K(
-            x['cumulative_cases'], x['TotalPopulation']), axis=1)
-
-    # Rename Columns
-    # Iterate over all data frames in dictionary
-    for df in d.values():
-        df.rename(columns={'Country.Region': 'Country', 'Lat': 'Latitude', 'Long': 'Longitude',
-                           'daily_reported_cases': 'DailyReportedCases', 'date': 'Date', 'type': 'CaseType', 'iso2Code': 'ISO2Code',
-                           'iso3Code': 'ISO3Code', 'isoNumCode': 'ISONumCode', 'cumulative_cases': 'CumulativeReportedCases',
-                           'daily_per_100K': 'DailyReportedCasesPer100K', 'cumulative_per_100K': 'CumulativeReportedCasesPer100K'}, inplace=True)
-
-    # Calculate Growth Factors
-    group_vars = ['Country', 'DisplayName', 'Latitude', 'Longitude', 'ISO2Code',
-                  'ISO3Code', 'ISONumCode', 'TotalPopulation']
-
-    for df in d.values():
-        df['GrowthFactor'] = df.groupby(group_vars)['CumulativeReportedCases'].apply(
-            lambda x: x.pct_change() + 1)
-
-    # Calculate Doubline Times in Rolling Window (7 days)
-    group_vars = ['Country', 'DisplayName', 'Latitude', 'Longitude', 'ISO2Code',
-                  'ISO3Code', 'ISONumCode', 'TotalPopulation', 'Continent', 'Date', 'CaseType',
-                  'DailyReportedCases', 'CumulativeReportedCases',
-                  'DailyReportedCasesPer100K', 'CumulativeReportedCasesPer100K']
-
-    for key, value in d.items():
-        grp = pd.DataFrame(value.groupby(group_vars)['GrowthFactor'].sum())
-        grp['GF_RollingGeomMean'] = grp.rolling(7).apply(gmean, raw=True)
-        grp.reset_index(inplace=True)
-        d[key] = grp
-
-    del grp
-
-    for df in d.values():
-        df['DoublingTime'] = df['GF_RollingGeomMean'].apply(
-            lambda x: calculate_doubling_time(x))
-
+def add_statistics(df):
     # Join data frames in d
-    df = pd.concat(list(d.values()), ignore_index=True)
+    #df = pd.concat(list(d.values()), ignore_index=True)
 
     return df
 
 
-covid_data = add_stats(covid_data_pop_size)
+covid_data = add_statistics(covid_data_renamed)
 #  ------------ Add Population Data ------------
 
 #  ------------ Add Population Data ------------
+
+# ========================================
+#
+# ========================================
+# Create list of all case types in dataset
+case_types = list(CORONA_DATA['type'].unique())
+
+
+def split_apply_combine(df):
+    # Create empty dictionary for dataframes
+    d = {}
+
+    for case_type in case_types:
+        df_temp = df[df['CaseType'] == case_type]
+        df_temp = calculate_cumsum(df_temp)
+        d['df_{}'.format(case_type)] = df_temp
+
+    # Join data frames in d
+    df_new = pd.concat(list(d.values()), ignore_index=True)
+
+    return df_new
+
+
+covid_data_world = split_apply_combine(covid_data_world)
 
 # ========================================
 #           PROCESSED DATAFRAMES
