@@ -1,23 +1,29 @@
-Python
-==============================
+# 2019 Novel Coronavirus (COVID-19) Dashboard Monitor and Data Repository
 
-A short description of the project.
+[![license](https://img.shields.io/github/license/Perishleaf/data-visualisation-scripts)](https://github.com/Perishleaf/data-visualisation-scripts/blob/master/LICENSE)
 
-Project Organization
+This public repository is created as part of a practice project at LMU Statistics.
+
+Dashboard is deployed on Heroku and can be accessed from [https://dash-coronavirus-2020.herokuapp.com/](https://covid-19-stats-project.herokuapp.com)
+
+The data used in this project is sourced from 
+
+- Ramil Kiprin
+- UN Population Prospects
+- World Bank Data
+- Oxford Government Response Tracker
+
+## Project Organization
+
 ------------
 
     ├── LICENSE
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
     ├── README.md          <- The top-level README for developers using this project.
     ├── data
     │   ├── external       <- Data from third party sources.
     │   ├── interim        <- Intermediate data that has been transformed.
     │   ├── processed      <- The final, canonical data sets for modeling.
     │   └── raw            <- The original, immutable data dump.
-    │
-    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
-    │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
     │
     ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
     │                         the creator's initials, and a short `-` delimited description, e.g.
@@ -34,23 +40,12 @@ Project Organization
     ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
     ├── src                <- Source code for use in this project.
     │   ├── __init__.py    <- Makes src a Python module
+    │   │          
+    │   └── make_dataset.py     <- Scripts to download or generate data
     │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
-    │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
-
+    │   └── build_features.py   <- Scripts to turn raw data into features for modeling
+    │   │ 
+    │   └── visualize.py        <- Scripts to create exploratory and results oriented visualizations
 
 --------
 
