@@ -6,10 +6,7 @@ from dash.dependencies import Input, Output
 import dash_table
 
 from app import app
-from src.features import covid_data, covid_data_world
-
-print(covid_data.columns)
-print(covid_data_world.columns)
+from src.features import covid_data_countries, covid_data_world
 
 map_description = '''
 Some useful info
