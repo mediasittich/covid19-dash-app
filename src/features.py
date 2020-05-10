@@ -321,10 +321,8 @@ covid_data_world['Country'] = 'World'
 #  ------------ Calculate Cumulative Sums ------------
 
 
-def calculate_cumsum(df):
-    # Create list with grouping variables for cumsum
-    group_vars = ['Country', 'TotalPopulation']
-
+def calculate_cumsum(df, group_vars):
+    df.reset_index(inplace=True)
     df['CumulativeReportedCases'] = df.groupby(
         group_vars)['DailyReportedCases'].apply(lambda x: x.cumsum())
     return df
@@ -338,8 +336,21 @@ def calculate_per_100K(n, popTotal):
 #  ------------ Calculate Growth Factors ------------
 
 
-def calculate_growth_factors(df):
-    pass
+def calculate_growth_factors(df, group_vars):
+    df.reset_index(inplace=True)
+    df['GrowthFactor'] = df.groupby(group_vars)['CumulativeReportedCases'].apply(
+        lambda x: x.pct_change() + 1)
+    return df
+
+#  ------------ Calculate Rolling Geometric Mean ------------
+
+
+def calculate_roll_geom_mean(df, group_vars):
+    grp = pd.DataFrame(df.groupby(group_vars)['GrowthFactor'].sum())
+    grp['GF_RollingGeomMean'] = grp.rolling(7).apply(gmean, raw=True)
+    grp.reset_index(inplace=True)
+    df = grp
+    return df
 
 #  ------------ Calculate Doubling Time ------------
 
@@ -347,22 +358,6 @@ def calculate_growth_factors(df):
 def calculate_doubling_time(geom_mean):
     return ln(2)/ln(geom_mean)
 
-#  ------------ Add Stats ------------
-
-# Apply Statistics Functions to Data Frames
-
-
-def add_statistics(df):
-    # Join data frames in d
-    #df = pd.concat(list(d.values()), ignore_index=True)
-
-    return df
-
-
-covid_data = add_statistics(covid_data_renamed)
-#  ------------ Add Population Data ------------
-
-#  ------------ Add Population Data ------------
 
 # ========================================
 #
@@ -370,14 +365,56 @@ covid_data = add_statistics(covid_data_renamed)
 # Create list of all case types in dataset
 case_types = list(CORONA_DATA['type'].unique())
 
+# Create list with grouping variables for cumsum
+group_vars = {
+    'countries': [
+        ['Country', 'DisplayName', 'Latitude', 'Longitude', 'ISO2Code',
+         'ISO3Code', 'ISONumCode', 'TotalPopulation'],  # for CumSum & Growth Factors
+        ['Country', 'DisplayName', 'Latitude', 'Longitude', 'ISO2Code',
+         'ISO3Code', 'ISONumCode', 'TotalPopulation', 'Continent', 'Date', 'CaseType',
+         'DailyReportedCases', 'CumulativeReportedCases',
+         'DailyReportedCasesPer100K', 'CumulativeReportedCasesPer100K']  # for Doubling Times in Rolling Windows
+    ],
+    'world': [
+        ['Country'],  # for CumSum & Growth Factors
+        ['Country', 'Date', 'CaseType',
+         'DailyReportedCases', 'CumulativeReportedCases',
+         'DailyReportedCasesPer100K', 'CumulativeReportedCasesPer100K']  # for Doubline Times in Rolling Windows
+    ]
+}
 
-def split_apply_combine(df):
+# ============= Apply Statistics Functions to Data Frames =============
+
+
+def add_statistics(df, group_vars):
     # Create empty dictionary for dataframes
     d = {}
 
     for case_type in case_types:
         df_temp = df[df['CaseType'] == case_type]
-        df_temp = calculate_cumsum(df_temp)
+        # Reset index (drop current index)
+        # df = df.reset_index(drop=True)
+        # Calculate cumsum
+        df_temp = calculate_cumsum(df_temp, group_vars[0])
+
+        # Calculate per 100K
+        df_temp['DailyReportedCasesPer100K'] = df_temp.apply(lambda x: calculate_per_100K(
+            x['DailyReportedCases'], x['TotalPopulation']), axis=1)
+        # Calculate cumulative  cases per 100K
+        df_temp['CumulativeReportedCasesPer100K'] = df_temp.apply(lambda x: calculate_per_100K(
+            x['CumulativeReportedCases'], x['TotalPopulation']), axis=1)
+
+        # Calculate Growth Factors
+        df_temp = calculate_growth_factors(df_temp, group_vars[0])
+
+        # Calculate Rolling Geometric Mean
+        df_temp = calculate_roll_geom_mean(df_temp, group_vars[1])
+
+        # Calculate Doubling Times
+        df_temp['DoublingTime'] = df_temp['GF_RollingGeomMean'].apply(
+            lambda x: calculate_doubling_time(x))
+
+        # Add df to dict
         d['df_{}'.format(case_type)] = df_temp
 
     # Join data frames in d
@@ -386,7 +423,9 @@ def split_apply_combine(df):
     return df_new
 
 
-covid_data_world = split_apply_combine(covid_data_world)
+covid_data_world = add_statistics(covid_data_world, group_vars['world'])
+covid_data_countries = add_statistics(
+    covid_data_countries, group_vars['countries'])
 
 # ========================================
 #           PROCESSED DATAFRAMES
