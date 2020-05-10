@@ -6,7 +6,7 @@ This public repository is created as part of a practice project at LMU Statistic
 
 Dashboard is deployed on Heroku and can be accessed from [https://dash-coronavirus-2020.herokuapp.com/](https://covid-19-stats-project.herokuapp.com)
 
-The corresponding Jupyter Notebooks can be viewed [here](https://mybinder.org/v2/gh/mediasittich/covid19-dash-app/5ed7346e4e585b0a40116eed3090ec4b093fd3a8)
+The corresponding Jupyter Notebooks can be viewed on Binder in the `notebooks` directory:
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/mediasittich/covid19-dash-app/master)
 
