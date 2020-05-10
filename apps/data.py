@@ -41,8 +41,8 @@ layout = html.Div([
         dash_table.DataTable(
             id='covid-cases-table',
             columns=[{'name': i, 'id': i}
-                     for i in covid_data_countries.columns],
-            data=covid_data_countries.to_dict('records'),
+                     for i in covid_data_world.columns],
+            data=covid_data_world.to_dict('records'),
             page_size=10,  # for pagination with 10 rows per page
             #style_table={'overflowX': 'auto'},
             style_cell={'textAlign': 'left'},
