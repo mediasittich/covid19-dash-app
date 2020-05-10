@@ -59,7 +59,7 @@ yaxis_cumsum_radioitems = dbc.FormGroup([
     dbc.RadioItems(
         options=[
             {'label': 'linear', 'value': 'linear'},
-            {'label': 'logarithmic', 'value': 'logarithmic'}
+            {'label': 'logarithmic', 'value': 'log'}
         ],
         value='linear',
         id='yaxis-cumsum-scale-radioinput'
@@ -129,8 +129,7 @@ def update_numbers(country):
     # Output('plot_cumulative_cases', 'figure'),
     [Input('country-dropdown', 'value'), Input('case-type-input', 'value'),
      Input('yaxis-cumsum-scale-radioinput', 'value')])
-def update_cumsum_graph(country, case_type, scale_type):
+def update_cumsum_graph(country, case_types, scale_type):
     df = covid_data_countries[
         covid_data_countries['DisplayName'] == country]
-
-    return plot_multiple_timeseries(df['Date'], df['CumulativeReportedCases'])
+    return plot_multiple_timeseries(df, 'CumulativeReportedCases', case_types, scale_type)
