@@ -22,7 +22,6 @@ def plot_multiple_timeseries(data, metric, case_types, scale_type):
     fig = go.Figure()
 
     for ct in case_types:
-        print(ct)
         df = data[data['CaseType'] == ct]
 
         fig.add_trace(
