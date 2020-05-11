@@ -90,3 +90,12 @@ layout = html.Div([
     ])),
 
 ])
+
+
+@app.callback(
+    Output('plot_cumulative_cases_world', 'figure'),
+    [Input('case-type-world-input', 'value'),
+     Input('yaxis-cumsum-scale-world-radioinput', 'value')])
+def update_cumsum_graph(case_types, scale_type):
+    df = covid_data_world
+    return plot_multiple_timeseries(df, 'CumulativeReportedCases', case_types, scale_type)
