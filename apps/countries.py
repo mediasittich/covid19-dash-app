@@ -1,7 +1,6 @@
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
-import plotly.graph_objects as go
 from dash.dependencies import Input, Output
 
 import datetime
@@ -35,7 +34,7 @@ for case_type, color in case_type_colors.items():
     print(case_type, color)
     card_content = dbc.CardBody([
         html.H5('{}'.format(case_type.capitalize()), className='card-title'),
-        html.H2('Some Number', id='number-{}'.format(case_type),
+        html.H2(id='number-{}'.format(case_type),
                 className='card-text')
     ])
     cards.append(dbc.Col(dbc.Card(card_content, color=color, inverse=True)))
@@ -73,16 +72,16 @@ layout = html.Div([
     # Country Selector
     dbc.Row([
         dbc.Col([
-            # html.H4('Country'),
             dropdown,
         ]),
     ]),
 
+    # Display Selected Country
     dbc.Row(dbc.Col([
         html.H1(id='display-selection', className='mb-4'),
     ])),
 
-    # Dipslay Current Numbers
+    # Display Current Numbers
     dbc.Row(cards, className='mb-4'),
 
     # Display Checkboxes for CaseType Selection

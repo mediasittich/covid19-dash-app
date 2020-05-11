@@ -8,9 +8,6 @@ import dash_table
 from app import app
 from src.features import covid_data_countries, covid_data_world, case_types
 
-
-print(covid_data_world.tail())
-
 data_description = '''
 Some useful info
 '''
@@ -42,7 +39,7 @@ layout = html.Div([
             id='covid-cases-table',
             columns=[{'name': i, 'id': i}
                      for i in covid_data_world.columns],
-            data=covid_data_world.to_dict('records'),
+            data=covid_data_countries.head().to_dict('records'),
             page_size=10,  # for pagination with 10 rows per page
             #style_table={'overflowX': 'auto'},
             style_cell={'textAlign': 'left'},
